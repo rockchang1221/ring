@@ -94,20 +94,20 @@ html, body {
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center; /* 垂直置中 */
-    align-items: center;     /* 水平置中 */
+    align-items: center;
     gap: 30px;
-    text-align: center;
 }
 .cardImage {
     max-width: 90%;
-    margin: 0 auto; /* 水平置中 */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
 }
 </style>
 </head>
 <body>
+
+<!-- 音樂檔案 -->
+<audio id="fireworkAudio" src="人間煙火_RING卡片用.MP3"></audio> <!-- <-- 把這裡改成你的音樂連結 -->
 
 <!-- 首頁：輸入密碼 -->
 <section id="loginSection">
@@ -137,10 +137,10 @@ html, body {
 // ====== 密碼檢查 ======
 document.getElementById('submitBtn').addEventListener('click',()=>{
     const code = document.getElementById('codeInput').value.trim();
-    if(code.toUpperCase() === "YOURCODE"){ // 修改成你的代碼
+    if(code.toUpperCase() === "YOURCODE"){ // <-- 修改成你的代碼
         document.getElementById('loginSection').style.display = "none";
         document.getElementById('fireworkSection').style.display = "block";
-        document.getElementById('cardSection').style.display = "flex"; // 只有進入煙火頁才顯示卡片
+        document.getElementById('cardSection').style.display = "flex";
         startFireworks();
     } else {
         alert("密碼錯誤，再試試！");
@@ -155,18 +155,14 @@ canvas.height = window.innerHeight;
 
 let particles = [];
 let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
-let autoFireworkStarted = false;
+let autoFireworkStarted = false; // 是否已經啟動自動煙火
 
 // 煙火粒子
 function createFirework(x, y, withText=false) {
-    const rect = canvas.getBoundingClientRect();
-    const offsetX = x - rect.left;
-    const offsetY = y - rect.top;
-
     for(let i=0;i<30;i++){
         particles.push({
-            x: offsetX,
-            y: offsetY,
+            x: x,
+            y: y,
             vx: (Math.random()-0.5)*4,
             vy: (Math.random()-0.5)*4,
             alpha: 1,
@@ -174,7 +170,7 @@ function createFirework(x, y, withText=false) {
         });
     }
     if(withText){
-        showFireText(offsetX, offsetY);
+        showFireText(x,y);
     }
 }
 
@@ -215,24 +211,38 @@ function startFireworks(){
     animate();
 }
 
-// 點擊觸發煙火 + 文字
+// 點擊觸發煙火 + 文字 + 首次觸發音樂
 canvas.addEventListener('click', (e)=>{
-    createFirework(e.clientX, e.clientY, true);
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    createFirework(x, y, true);
 
     if(!autoFireworkStarted){
         autoFireworkStarted = true;
+
+        // 隱藏提示詞
         document.getElementById("fireworkMessage").classList.add("hidden");
+
+        // 播放音樂
+        const audio = document.getElementById("fireworkAudio");
+        audio.play();
+
+        // 自動煙火
         setInterval(()=>{
             createFirework(Math.random()*canvas.width, Math.random()*canvas.height/2 + canvas.height/4);
-        },500); // 更高頻率
+        },400); // <-- 提高自動頻率
     }
 });
 
 // ====== 桌機版彩蛋：滑鼠移動也會帶小煙火 ======
 if(window.innerWidth > 768){
     document.addEventListener('mousemove',(e)=>{
-        if(Math.random() < 0.05){
-            createFirework(e.clientX, e.clientY);
+        if(Math.random() < 0.05){ // 機率降低避免太炸
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            createFirework(x, y);
         }
     });
 }
