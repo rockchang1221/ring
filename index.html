@@ -105,7 +105,6 @@ html, body {
     <canvas id="fireworkCanvas"></canvas>
     <div id="fireworkMessage">
         <div>點看看螢幕會發生什麼事👀</div>
-        <div>往下滑說不定還有驚喜！</div>
     </div>
 </section>
 
@@ -116,7 +115,7 @@ html, body {
 // ====== 密碼檢查 ======
 function checkPassword() {
     const code = document.getElementById('codeInput').value.trim();
-    if(code.toUpperCase() === "YOURCODE"){ 
+    if(code.toUpperCase() === "5201"){ 
         document.getElementById('loginSection').style.display = "none";
         document.getElementById('fireworkSection').style.display = "block";
         startFireworks();
@@ -125,10 +124,7 @@ function checkPassword() {
     }
 }
 
-// 按按鈕送出
 document.getElementById('submitBtn').addEventListener('click', checkPassword);
-
-// 按 Enter 送出
 document.getElementById('codeInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         checkPassword();
@@ -146,6 +142,7 @@ let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
 let autoFireworkStarted = false; 
 let musicStarted = false; 
 let mouseFireworkEnabled = false; 
+let firstClick = true; // ✅ 新增：判斷是不是第一次手動煙火
 
 function createFirework(x, y, withText=false) {
     for(let i=0;i<40;i++){
@@ -211,20 +208,34 @@ function startFireworks(){
     animate();
 }
 
-// 點擊觸發煙火 + 文字 + 音樂
+// 點擊觸發煙火
 canvas.addEventListener('click', (e)=>{
     createFirework(e.clientX, e.clientY, true);
+
+    if(firstClick){  
+        firstClick = false;
+        // ✅ 百花齊放（隨機10組煙火同時炸）
+        for(let i=0; i<50; i++){
+            setTimeout(()=>{
+                createFirework(
+                    Math.random()*canvas.width,
+                    Math.random()*canvas.height/2 + canvas.height/4
+                );
+            }, i*30);
+        }
+    }
+
     if(!autoFireworkStarted){
         autoFireworkStarted = true;
         mouseFireworkEnabled = true;
         document.getElementById("fireworkMessage").classList.add("hidden");
         setInterval(()=>{
             createFirework(Math.random()*canvas.width, Math.random()*canvas.height/2 + canvas.height/4);
-        },600); 
+        },400); 
     }
 });
 
-// 桌機版彩蛋，滑鼠追蹤只在第一次手動觸發後啟動，頻率低一點
+// 桌機版彩蛋，滑鼠追蹤
 document.addEventListener('mousemove',(e)=>{
     if(window.innerWidth > 768 && mouseFireworkEnabled && Math.random() < 0.02){
         createFirework(e.clientX, e.clientY);
