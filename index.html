@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>彩蛋頁面</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    color: #fff;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    overflow-x: hidden;
+}
+
+/* ====== 首頁 (密碼輸入區) ====== */
+#loginSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+#codeInput {
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+}
+#submitBtn {
+    padding: 10px 15px;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    border-radius: 8px;
+    border: none;
+    background: #ff5e5e;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* ====== 煙火區 ====== */
+#fireworkSection {
+    display: none;
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    text-align: center;
+    overflow: hidden;
+}
+#fireworkCanvas {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+#fireworkMessage {
+    position: relative;
+    z-index: 1;
+    top: 40%;
+    font-size: 1.3rem;
+    text-align: center;
+    line-height: 2rem;
+    transition: opacity 0.5s ease;
+}
+#fireworkMessage.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* 點擊煙火文字 */
+.fireText {
+    position: absolute;
+    color: #fff;
+    font-size: 1rem;
+    pointer-events: none;
+    white-space: nowrap;
+    text-shadow: 0 0 5px rgba(255,255,255,0.8);
+    animation: fadeUp 1.5s forwards;
+}
+@keyframes fadeUp {
+    0% {opacity:1; transform: translateY(0);}
+    100% {opacity:0; transform: translateY(-40px);}
+}
+
+/* ====== 卡片區 ====== */
+#cardSection {
+    display: none;
+    opacity: 0;
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+    transition: opacity 1.2s ease;
+}
+#cardSection.show {
+    display: flex;
+    opacity: 1;
+}
+.cardImage {
+    max-width: 90%;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+}
+</style>
+</head>
+<body>
+
+<!-- 首頁：輸入密碼 -->
+<section id="loginSection">
+    <h2>輸入密碼解鎖驚喜 ✨</h2>
+    <div>
+        <input type="text" id="codeInput" placeholder="輸入密碼">
+        <button id="submitBtn">確認</button>
+    </div>
+</section>
+
+<!-- 煙火區 -->
+<section id="fireworkSection">
+    <canvas id="fireworkCanvas"></canvas>
+    <div id="fireworkMessage">
+        <div>點看看螢幕會發生什麼事👀</div>
+        <div>往下滑說不定還有驚喜！</div>
+    </div>
+</section>
+
+<!-- 卡片區 -->
+<section id="cardSection">
+    <img class="cardImage" src="card1.png" alt="卡片1">
+    <img class="cardImage" src="card2.png" alt="卡片2">
+</section>
+
+<script>
+// ====== 密碼檢查 ======
+document.getElementById('submitBtn').addEventListener('click',()=>{
+    const code = document.getElementById('codeInput').value.trim();
+    if(code.toUpperCase() === "YOURCODE"){ // 修改成你的代碼
+        document.getElementById('loginSection').style.display = "none";
+        document.getElementById('fireworkSection').style.display = "block";
+        startFireworks();
+    } else {
+        alert("密碼錯誤，再試試！");
+    }
+});
+
+// ====== 煙火動畫 ======
+const canvas = document.getElementById('fireworkCanvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
+let autoFireworkStarted = false; // 是否已經啟動自動煙火
+
+// 煙火粒子
+function createFirework(x, y, withText=false) {
+    for(let i=0;i<30;i++){
+        particles.push({
+            x: x,
+            y: y,
+            vx: (Math.random()-0.5)*4,
+            vy: (Math.random()-0.5)*4,
+            alpha: 1,
+            color: colors[Math.floor(Math.random()*colors.length)]
+        });
+    }
+    if(withText){
+        showFireText(x,y);
+    }
+}
+
+// 點擊煙火文字
+const fireTexts = ["欸你真的很可愛","嘿嘿被你發現了","偷偷告訴你一件事","哇你點中了！","🥰 給你一個驚喜"];
+function showFireText(x,y){
+    const text = document.createElement("div");
+    text.className = "fireText";
+    text.style.left = x+"px";
+    text.style.top = y+"px";
+    text.textContent = fireTexts[Math.floor(Math.random()*fireTexts.length)];
+    document.body.appendChild(text);
+    setTimeout(()=>{ text.remove(); },1500);
+}
+
+// 動畫 loop
+function animate() {
+    ctx.fillStyle = "rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    for(let i=0;i<particles.length;i++){
+        let p = particles[i];
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
+        ctx.fill();
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+        if(p.alpha <= 0) particles.splice(i,1);
+    }
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+}
+
+// 初始化煙火
+function startFireworks(){
+    animate();
+}
+
+// 點擊觸發煙火 + 文字
+canvas.addEventListener('click', (e)=>{
+    // 修正點擊位置偏差
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    createFirework(x, y, true);
+
+    // 第一次點擊才啟動自動煙火 + 隱藏提示詞 + 顯示卡片
+    if(!autoFireworkStarted){
+        autoFireworkStarted = true;
+        document.getElementById("fireworkMessage").classList.add("hidden");
+        setInterval(()=>{
+            createFirework(
+                Math.random()*canvas.width, 
+                Math.random()*canvas.height/2 + canvas.height/4
+            );
+        },250); // 🔥 頻率更高 (0.5 秒一次)
+
+        // 顯示卡片 (淡入效果)
+        const cardSection = document.getElementById('cardSection');
+        cardSection.classList.add("show");
+    }
+});
+
+// ====== 桌機版彩蛋：滑鼠移動也會帶小煙火 ======
+if(window.innerWidth > 768){
+    document.addEventListener('mousemove',(e)=>{
+        if(Math.random() < 0.05){ // 機率降低避免太炸
+            const rect = canvas.getBoundingClientRect();
+            createFirework(e.clientX - rect.left, e.clientY - rect.top);
+        }
+    });
+}
+
+// 調整畫布大小
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
