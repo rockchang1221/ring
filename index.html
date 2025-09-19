@@ -89,22 +89,19 @@ html, body {
 /* ====== 卡片區 ====== */
 #cardSection {
     display: none;
-    opacity: 0;
     width: 100%;
     min-height: 100vh;
     padding: 40px 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    justify-content: center; /* 垂直置中 */
+    align-items: center;     /* 水平置中 */
     gap: 30px;
-    transition: opacity 1.2s ease;
-}
-#cardSection.show {
-    display: flex;
-    opacity: 1;
+    text-align: center;
 }
 .cardImage {
     max-width: 90%;
+    margin: 0 auto; /* 水平置中 */
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(255,255,255,0.2);
 }
@@ -143,6 +140,7 @@ document.getElementById('submitBtn').addEventListener('click',()=>{
     if(code.toUpperCase() === "YOURCODE"){ // 修改成你的代碼
         document.getElementById('loginSection').style.display = "none";
         document.getElementById('fireworkSection').style.display = "block";
+        document.getElementById('cardSection').style.display = "flex"; // 只有進入煙火頁才顯示卡片
         startFireworks();
     } else {
         alert("密碼錯誤，再試試！");
@@ -157,14 +155,18 @@ canvas.height = window.innerHeight;
 
 let particles = [];
 let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
-let autoFireworkStarted = false; // 是否已經啟動自動煙火
+let autoFireworkStarted = false;
 
 // 煙火粒子
 function createFirework(x, y, withText=false) {
+    const rect = canvas.getBoundingClientRect();
+    const offsetX = x - rect.left;
+    const offsetY = y - rect.top;
+
     for(let i=0;i<30;i++){
         particles.push({
-            x: x,
-            y: y,
+            x: offsetX,
+            y: offsetY,
             vx: (Math.random()-0.5)*4,
             vy: (Math.random()-0.5)*4,
             alpha: 1,
@@ -172,7 +174,7 @@ function createFirework(x, y, withText=false) {
         });
     }
     if(withText){
-        showFireText(x,y);
+        showFireText(offsetX, offsetY);
     }
 }
 
@@ -215,36 +217,22 @@ function startFireworks(){
 
 // 點擊觸發煙火 + 文字
 canvas.addEventListener('click', (e)=>{
-    // 修正點擊位置偏差
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    createFirework(e.clientX, e.clientY, true);
 
-    createFirework(x, y, true);
-
-    // 第一次點擊才啟動自動煙火 + 隱藏提示詞 + 顯示卡片
     if(!autoFireworkStarted){
         autoFireworkStarted = true;
         document.getElementById("fireworkMessage").classList.add("hidden");
         setInterval(()=>{
-            createFirework(
-                Math.random()*canvas.width, 
-                Math.random()*canvas.height/2 + canvas.height/4
-            );
-        },250); // 🔥 頻率更高 (0.5 秒一次)
-
-        // 顯示卡片 (淡入效果)
-        const cardSection = document.getElementById('cardSection');
-        cardSection.classList.add("show");
+            createFirework(Math.random()*canvas.width, Math.random()*canvas.height/2 + canvas.height/4);
+        },500); // 更高頻率
     }
 });
 
 // ====== 桌機版彩蛋：滑鼠移動也會帶小煙火 ======
 if(window.innerWidth > 768){
     document.addEventListener('mousemove',(e)=>{
-        if(Math.random() < 0.05){ // 機率降低避免太炸
-            const rect = canvas.getBoundingClientRect();
-            createFirework(e.clientX - rect.left, e.clientY - rect.top);
+        if(Math.random() < 0.05){
+            createFirework(e.clientX, e.clientY);
         }
     });
 }
