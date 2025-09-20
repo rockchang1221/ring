@@ -108,8 +108,14 @@ html, body {
     </div>
 </section>
 
-<!-- 音樂檔案（替換連結） -->
+<!-- ✅ 背景音樂檔案（請替換檔名/路徑） -->
 <audio id="fireworkMusic" src="人間煙火_RING卡片用.MP3" loop></audio>
+
+<!-- ✅ 百花齊放音效（首次百花齊放時播放一次） -->
+<audio id="fireworkSound" src="firework_boom.mp3"></audio>
+
+<!-- ✅ 單發煙火音效（每次手動點擊煙火都會播放） -->
+<audio id="singleFireSound" src="single_fire.mp3"></audio>
 
 <script>
 // ====== 密碼檢查 ======
@@ -119,41 +125,40 @@ function checkPassword() {
         document.getElementById('loginSection').style.display = "none";
         document.getElementById('fireworkSection').style.display = "block";
         startFireworks();
+        enableSparkMode(); // ✅ 密碼正確後再啟動滑鼠小花火
     } else {
         alert("密碼錯誤，再試試！");
     }
 }
-
 document.getElementById('submitBtn').addEventListener('click', checkPassword);
 document.getElementById('codeInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-        checkPassword();
-    }
+    if (e.key === 'Enter') checkPassword();
 });
 
-// ====== 煙火動畫 ======
+// ====== 畫布設定 ======
 const canvas = document.getElementById('fireworkCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particles = [];
-let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
-let autoFireworkStarted = false; 
-let musicStarted = false; 
-let mouseFireworkEnabled = false; 
-let firstClick = true; // ✅ 新增：判斷是不是第一次手動煙火
+let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"]; // 主煙火顏色
+let autoFireworkStarted = false;
+let musicStarted = false;
+let firstClick = true;
+let sparkMode = false; // ✅ 控制小花火啟動狀態
 
+// ====== 煙火 ======
 function createFirework(x, y, withText=false) {
     for(let i=0;i<40;i++){
         const speed = Math.random()*6 + 2;
         const angle = Math.random()*Math.PI*2;
         particles.push({
-            x: x,
-            y: y,
+            x: x, y: y,
             vx: Math.cos(angle)*speed,
             vy: Math.sin(angle)*speed,
             alpha: 1,
+            size: 3,
             color: colors[Math.floor(Math.random()*colors.length)]
         });
     }
@@ -161,37 +166,52 @@ function createFirework(x, y, withText=false) {
         showFireText(x, y);
         if(!musicStarted){
             musicStarted = true;
-            const music = document.getElementById('fireworkMusic');
-            music.play();
+            document.getElementById('fireworkMusic').play();
         }
     }
 }
 
-// 彩蛋文字
-const fireTexts = [
-    "你今天超帥！","欸，你很機智","這手速可以！","太有趣了吧","笑死太可愛",
-    "被你發現了吧","小天才來了","厲害欸","你有搞笑基因","哇，好聰明",
-    "讚啦！","你真的很會","哈哈，神操作","太厲害了吧","你又來了",
-    "強強強","棒棒棒","太有趣了","超級讚","你就是傳說"
-];
+// 🎇 滑鼠引線火花
+function createSpark(x, y){
+    for(let i=0;i<10;i++){
+        const speed = Math.random()*1.0 + 0.3;
+        const angle = Math.random()*Math.PI*2;
+        particles.push({
+            x: x, y: y,
+            vx: Math.cos(angle)*speed,
+            vy: Math.sin(angle)*speed,
+            alpha: 1,
+            size: 1.2,
+            color: Math.random() < 0.5 ? "#ffffff" : "#cccccc"
+        });
+    }
+}
+
+// ====== 彩蛋文字 ======
+const myWords = ["","","",""];
+const herWords = ["","","",""];
 function showFireText(x, y){
     const text = document.createElement("div");
     text.className = "fireText";
     text.style.left = x + "px"; 
     text.style.top = y + "px";
-    text.textContent = fireTexts[Math.floor(Math.random()*fireTexts.length)];
+    if(x < canvas.width/2){
+        text.textContent = myWords[Math.floor(Math.random()*myWords.length)];
+    } else {
+        text.textContent = herWords[Math.floor(Math.random()*herWords.length)];
+    }
     document.body.appendChild(text);
     setTimeout(()=>{ text.remove(); },1500);
 }
 
-// 動畫 loop
+// ====== 動畫 loop ======
 function animate() {
     ctx.fillStyle = "rgba(0,0,0,0.2)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
     for(let i=0;i<particles.length;i++){
-        let p = particles[i];
+        const p = particles[i];
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
         ctx.fillStyle = p.color;
         ctx.globalAlpha = p.alpha;
         ctx.fill();
@@ -203,18 +223,26 @@ function animate() {
     ctx.globalAlpha = 1;
     requestAnimationFrame(animate);
 }
+function startFireworks(){ animate(); }
 
-function startFireworks(){
-    animate();
-}
-
-// 點擊觸發煙火
+// ====== 點擊煙火 ======
 canvas.addEventListener('click', (e)=>{
+    // ✅ 單發煙火音效（每次手動點擊都播放）
+    const singleBoom = document.getElementById('singleFireSound');
+    singleBoom.currentTime = 0;
+    singleBoom.play();
+
     createFirework(e.clientX, e.clientY, true);
 
-    if(firstClick){  
+    if(firstClick){
         firstClick = false;
-        // ✅ 百花齊放（隨機10組煙火同時炸）
+
+        // ✅ 播放百花齊放音效（只播一次）
+        const boom = document.getElementById('fireworkSound');
+        boom.currentTime = 0;
+        boom.play();
+
+        // ✅ 百花齊放
         for(let i=0; i<50; i++){
             setTimeout(()=>{
                 createFirework(
@@ -227,22 +255,31 @@ canvas.addEventListener('click', (e)=>{
 
     if(!autoFireworkStarted){
         autoFireworkStarted = true;
-        mouseFireworkEnabled = true;
         document.getElementById("fireworkMessage").classList.add("hidden");
         setInterval(()=>{
             createFirework(Math.random()*canvas.width, Math.random()*canvas.height/2 + canvas.height/4);
-        },400); 
+        },400);
     }
 });
 
-// 桌機版彩蛋，滑鼠追蹤
+// ====== 滑鼠引線火花（密碼解鎖後才啟動）======
+let mouseX = null, mouseY = null;
+function enableSparkMode(){
+    sparkMode = true;
+}
 document.addEventListener('mousemove',(e)=>{
-    if(window.innerWidth > 768 && mouseFireworkEnabled && Math.random() < 0.02){
-        createFirework(e.clientX, e.clientY);
+    if(sparkMode && window.innerWidth > 768){
+        mouseX = e.clientX;
+        mouseY = e.clientY;
     }
 });
+setInterval(()=>{
+    if(sparkMode && mouseX!==null && window.innerWidth > 768){
+        createSpark(mouseX, mouseY);
+    }
+},40);
 
-// 調整畫布大小
+// ====== 視窗調整 ======
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
