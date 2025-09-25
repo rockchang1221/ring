@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5201｜Question1</title>
+<style>
+    html,body{
+        margin:0;
+        padding:0;
+        background:#000;
+    }
+
+    /* 電腦版顯示提示文字 */
+    @media (min-width:768px){
+        .mobileOnly{display:none;}
+        .desktopMsg{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            color:#fff;
+            font-size:2rem;
+            font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+        }
+    }
+
+    /* 手機版顯示圖檔輪播 */
+    @media (max-width:767px){
+        .desktopMsg{display:none;}
+        .mobileOnly{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            width:100%;
+            height:100vh;
+            overflow:hidden;
+            background:#000;
+            position:relative;
+        }
+        .mobileOnly img{
+            width:100%;          /* 橫向填滿 */
+            height:auto;         /* 維持比例 */
+            object-fit:contain;
+            position:absolute;
+            left:0;top:0;
+        }
+        .hide{display:none;}
+        .show{display:block;}
+    }
+</style>
+</head>
+<body>
+
+<!-- 電腦提示 -->
+<div class="desktopMsg">咦？只能用手機看喔</div>
+
+<!-- 手機版輪播區 -->
+<div class="mobileOnly">
+    <!-- 這裡改成該題兩張圖的路徑 -->
+    <img id="img1" src="Q1-A.png" class="show">
+    <img id="img2" src="Q1-B.png" class="hide">
+</div>
+
+<!-- 背景音樂 (隨機選擇) -->
+<audio id="bgMusic" loop></audio>
+
+<script>
+// ====== 兩張圖輪播 (無漸變) ======
+const img1 = document.getElementById('img1');
+const img2 = document.getElementById('img2');
+let showFirst = true;
+setInterval(()=>{
+    if(showFirst){
+        img1.classList.replace('show','hide');
+        img2.classList.replace('hide','show');
+    }else{
+        img1.classList.replace('hide','show');
+        img2.classList.replace('show','hide');
+    }
+    showFirst = !showFirst;
+}, 1000); // 1秒切換一次，可自行調整
+
+// ====== 隨機背景音樂 ======
+// 用 Fisher-Yates 洗牌方式增加隨機度
+const musicList = [
+    "BackgroundMusic/天天cover.mp3",
+    "BackgroundMusic/我不能不能喜歡你.mp3",
+    "BackgroundMusic/我喜歡你cover.mp3",
+    "BackgroundMusic/我喜歡靠在你的身後.mp3",
+    "BackgroundMusic/蚵仔麵線.mp3",
+    "BackgroundMusic/愛到才知痛cover.mp3"
+];
+
+// 洗牌函式
+function shuffle(array){
+    for(let i=array.length-1;i>0;i--){
+        const j=Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
+    }
+    return array;
+}
+
+const bgMusic = document.getElementById('bgMusic');
+const shuffled = shuffle([...musicList]); // 洗牌後再取第一首
+bgMusic.src = shuffled[0];
+bgMusic.volume = 0.7; // ✅ 預設70%，需要時直接改這行
+bgMusic.play().catch(()=>{}); // 避免自動播放限制錯誤
+</script>
+
+</body>
+</html>
