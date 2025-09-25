@@ -62,9 +62,6 @@
     <img id="img2" src="QuestionPage/Q1-B.png" class="hide">
 </div>
 
-<!-- 背景音樂 (直接指定) -->
-<audio id="bgMusic" loop></audio>
-
 <script>
 // ====== 兩張圖輪播 (無漸變) ======
 const img1 = document.getElementById('img1');
@@ -80,13 +77,6 @@ setInterval(()=>{
     }
     showFirst = !showFirst;
 }, 1000); // 1秒切換一次，可自行調整
-
-// ====== 背景音樂：指定播放某一首 ======
-const bgMusic = document.getElementById('bgMusic');
-// ✅ 直接指定檔案路徑（請確認檔案名稱與資料夾路徑正確）
-bgMusic.src = "BackgroundMusic/天天cover.mp3";
-bgMusic.volume = 0.7; // ✅ 預設70%，需要時直接改這行
-bgMusic.play().catch(()=>{}); // 避免自動播放限制錯誤
 </script>
 
 </body>
