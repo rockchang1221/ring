@@ -39,14 +39,35 @@
             position:relative;
         }
         .mobileOnly img{
-            width:100%;          /* 橫向填滿 */
-            height:auto;         /* 維持比例 */
+            width:100%;
+            height:auto;
             object-fit:contain;
             position:absolute;
             left:0;top:0;
         }
         .hide{display:none;}
         .show{display:block;}
+        /* 提示框樣式 */
+        #hintBox{
+            display:none;
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            background:rgba(0,0,0,0.85);
+            color:#fff;
+            padding:20px 30px;
+            border-radius:16px;
+            font-size:1.2rem;
+            font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+            text-align:center;
+            z-index:9999;
+            opacity:0;
+            transition:opacity 0.3s ease;
+        }
+        #hintBox.show{
+            display:block;
+            opacity:1;
+        }
     }
 </style>
 </head>
@@ -56,14 +77,17 @@
 <div class="desktopMsg">咦？只能用手機看喔</div>
 
 <!-- 手機版輪播區 -->
-<div class="mobileOnly">
+<div class="mobileOnly" id="mobileArea">
     <!-- 這裡改成該題兩張圖的路徑 -->
     <img id="img1" src="QuestionPage/Q1-A.png" class="show">
     <img id="img2" src="QuestionPage/Q1-B.png" class="hide">
 </div>
 
+<!-- 浮動提示框 -->
+<div id="hintBox">💡提示：答案是 B</div>
+
 <script>
-// ====== 兩張圖輪播 (無漸變) ======
+// ====== 兩張圖輪播 ======
 const img1 = document.getElementById('img1');
 const img2 = document.getElementById('img2');
 let showFirst = true;
@@ -76,7 +100,16 @@ setInterval(()=>{
         img2.classList.replace('show','hide');
     }
     showFirst = !showFirst;
-}, 650); // 1秒切換一次，可自行調整
+}, 650);
+
+// ====== 提示框點擊控制 ======
+const hintBox = document.getElementById('hintBox');
+document.getElementById('mobileArea').addEventListener('click', e=>{
+    // 若點擊目標不是提示框本身
+    if(!e.target.closest('#hintBox')){
+        hintBox.classList.toggle('show');
+    }
+});
 </script>
 
 </body>
