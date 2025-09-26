@@ -78,7 +78,6 @@
 
 <!-- 手機版輪播區 -->
 <div class="mobileOnly" id="mobileArea">
-    <!-- 這裡改成該題兩張圖的路徑 -->
     <img id="img1" src="QuestionPage/Q1-A.png" class="show">
     <img id="img2" src="QuestionPage/Q1-B.png" class="hide">
 </div>
@@ -102,12 +101,21 @@ setInterval(()=>{
     showFirst = !showFirst;
 }, 650);
 
-// ====== 提示框點擊控制 ======
+// ====== 提示框：雙擊開啟、單擊關閉 ======
 const hintBox = document.getElementById('hintBox');
-document.getElementById('mobileArea').addEventListener('click', e=>{
-    // 若點擊目標不是提示框本身
+const mobileArea = document.getElementById('mobileArea');
+
+// 雙擊 → 顯示提示框
+mobileArea.addEventListener('dblclick', e=>{
     if(!e.target.closest('#hintBox')){
-        hintBox.classList.toggle('show');
+        hintBox.classList.add('show');
+    }
+});
+
+// 單擊 → 如果提示框已開啟就關閉
+mobileArea.addEventListener('click', e=>{
+    if(hintBox.classList.contains('show') && !e.target.closest('#hintBox')){
+        hintBox.classList.remove('show');
     }
 });
 </script>
