@@ -9,6 +9,8 @@
         margin:0;
         padding:0;
         background:#000;
+        width:100%;
+        height:100%;
     }
 
     /* 電腦版顯示提示文字 */
@@ -31,20 +33,20 @@
         .mobileOnly{
             display:flex;
             justify-content:center;
-            align-items:center;
+            align-items:flex-start;
             width:100%;
-            height:100vh;
-            overflow:hidden;
+            min-height:100vh;       /* ✅ 高度隨圖片延伸 */
             background:#000;
             position:relative;
+            overflow-x:hidden;      /* 禁橫向捲動 */
+            overflow-y:auto;        /* ✅ 可上下滑動 */
         }
-        /* ✅ 修正圖片設定：完整顯示且不失真 */
+        /* ✅ 寬度100%撐滿螢幕，高度自動等比例 */
         .mobileOnly img{
-            max-width:100%;
-            max-height:100%;
-            width:auto;
+            width:100%;
             height:auto;
-            object-fit:contain;
+            object-fit:cover;
+            display:none;
         }
         .hide{display:none;}
         .show{display:block;}
@@ -56,12 +58,12 @@
             transform:translate(-50%,-50%);
             background:rgba(0,0,0,0.85);
             color:#fff;
-            padding:20px 40px;      /* ➜ 寬度更寬 */
+            padding:20px 40px;
             border-radius:16px;
-            font-size:1.05rem;      /* ➜ 字小一點 */
+            font-size:1.05rem;
             font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
             text-align:center;
-            line-height:1.6;        /* ➜ 行距舒適 */
+            line-height:1.6;
             z-index:9999;
             opacity:0;
             transition:opacity 0.3s ease;
@@ -69,7 +71,7 @@
         #hintBox .sub{
             display:block;
             margin-top:6px;
-            font-size:0.75rem;     /* ➜ 小字說明 */
+            font-size:0.75rem;
             opacity:0.75;
         }
         #hintBox.show{
@@ -92,7 +94,7 @@
 
 <!-- 浮動提示框 -->
 <div id="hintBox">
-    這題很簡單欸...
+    💡提示：答案是 B
     <span class="sub">點擊任意一處即可關閉提示</span>
 </div>
 
@@ -116,14 +118,12 @@ setInterval(()=>{
 const hintBox = document.getElementById('hintBox');
 const mobileArea = document.getElementById('mobileArea');
 
-// 雙擊 → 顯示提示框
 mobileArea.addEventListener('dblclick', e=>{
     if(!e.target.closest('#hintBox')){
         hintBox.classList.add('show');
     }
 });
 
-// 單擊 → 如果提示框已開啟就關閉
 mobileArea.addEventListener('click', e=>{
     if(hintBox.classList.contains('show') && !e.target.closest('#hintBox')){
         hintBox.classList.remove('show');
