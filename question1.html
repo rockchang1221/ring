@@ -9,8 +9,7 @@
         margin:0;
         padding:0;
         background:#000;
-        width:100%;
-        height:100%;
+        /* ❌ 不要限制高度，交給圖片決定 */
     }
 
     /* 電腦版顯示提示文字 */
@@ -31,25 +30,20 @@
     @media (max-width:767px){
         .desktopMsg{display:none;}
         .mobileOnly{
-            display:flex;
-            justify-content:center;
-            align-items:flex-start;
             width:100%;
-            min-height:100vh;       /* ✅ 高度隨圖片延伸 */
             background:#000;
             position:relative;
-            overflow-x:hidden;      /* 禁橫向捲動 */
-            overflow-y:auto;        /* ✅ 可上下滑動 */
+            overflow-x:hidden;  /* ✅ 禁止橫向捲動 */
+            /* ❌ 不設定高度，允許垂直自然延伸 */
         }
-        /* ✅ 寬度100%撐滿螢幕，高度自動等比例 */
         .mobileOnly img{
-            width:100%;
-            height:auto;
-            object-fit:cover;
+            width:100%;         /* ✅ 寬度一定滿版 */
+            height:auto;        /* ✅ 高度等比例 */
             display:none;
         }
         .hide{display:none;}
         .show{display:block;}
+
         /* 提示框樣式 */
         #hintBox{
             display:none;
