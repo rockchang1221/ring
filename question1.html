@@ -38,12 +38,13 @@
             background:#000;
             position:relative;
         }
+        /* ✅ 修正圖片設定：完整顯示且不失真 */
         .mobileOnly img{
-            width:100%;
+            max-width:100%;
+            max-height:100%;
+            width:auto;
             height:auto;
             object-fit:contain;
-            position:absolute;
-            left:0;top:0;
         }
         .hide{display:none;}
         .show{display:block;}
@@ -55,14 +56,21 @@
             transform:translate(-50%,-50%);
             background:rgba(0,0,0,0.85);
             color:#fff;
-            padding:20px 30px;
+            padding:20px 40px;      /* ➜ 寬度更寬 */
             border-radius:16px;
-            font-size:1.2rem;
+            font-size:1.05rem;      /* ➜ 字小一點 */
             font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
             text-align:center;
+            line-height:1.6;        /* ➜ 行距舒適 */
             z-index:9999;
             opacity:0;
             transition:opacity 0.3s ease;
+        }
+        #hintBox .sub{
+            display:block;
+            margin-top:6px;
+            font-size:0.75rem;     /* ➜ 小字說明 */
+            opacity:0.75;
         }
         #hintBox.show{
             display:block;
@@ -83,7 +91,10 @@
 </div>
 
 <!-- 浮動提示框 -->
-<div id="hintBox">💡提示：答案是 B</div>
+<div id="hintBox">
+    這題很簡單欸...
+    <span class="sub">點擊任意一處即可關閉提示</span>
+</div>
 
 <script>
 // ====== 兩張圖輪播 ======
