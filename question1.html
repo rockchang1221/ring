@@ -9,7 +9,6 @@
         margin:0;
         padding:0;
         background:#000;
-        /* ❌ 不要限制高度，交給圖片決定 */
     }
 
     /* 電腦版顯示提示文字 */
@@ -33,13 +32,13 @@
             width:100%;
             background:#000;
             position:relative;
-            overflow-x:hidden;  /* ✅ 禁止橫向捲動 */
-            /* ❌ 不設定高度，允許垂直自然延伸 */
+            overflow-x:hidden;   /* 禁止橫向捲動 */
+            /* 不限制高度，允許垂直延伸 */
         }
         .mobileOnly img{
-            width:100%;         /* ✅ 寬度一定滿版 */
-            height:auto;        /* ✅ 高度等比例 */
-            display:none;
+            width:100%;          /* 橫向一定滿版 */
+            height:auto;         /* 高度自動等比例 */
+            /* ✅ 不要預設 display:none */
         }
         .hide{display:none;}
         .show{display:block;}
