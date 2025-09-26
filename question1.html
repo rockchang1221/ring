@@ -51,19 +51,22 @@
             transform:translate(-50%,-50%);
             background:rgba(0,0,0,0.85);
             color:#fff;
-            padding:20px 40px;
+            padding:12px 24px;       /* 🔹 調整內邊距，原本是 20px 40px */
             border-radius:16px;
+            width:80%;                /* 🔹 設定提示框寬度 */
+            max-width:360px;          /* 🔹 設定最大寬度避免太寬 */
             font-size:1.05rem;
             font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
             text-align:center;
-            line-height:1.6;
+            line-height:1.4;          /* 🔹 調整行高 */
             z-index:9999;
             opacity:0;
             transition:opacity 0.3s ease;
         }
+        /* 子文字樣式 */
         #hintBox .sub{
             display:block;
-            margin-top:6px;
+            margin-top:4px;           /* 🔹 減少子文字與主文字的距離 */
             font-size:0.75rem;
             opacity:0.75;
         }
