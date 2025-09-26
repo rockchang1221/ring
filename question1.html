@@ -32,13 +32,11 @@
             width:100%;
             background:#000;
             position:relative;
-            overflow-x:hidden;   /* 禁止橫向捲動 */
-            /* 不限制高度，允許垂直延伸 */
+            overflow-x:hidden;
         }
         .mobileOnly img{
-            width:100%;          /* 橫向一定滿版 */
-            height:auto;         /* 高度自動等比例 */
-            /* ✅ 不要預設 display:none */
+            width:100%;
+            height:auto;
         }
         .hide{display:none;}
         .show{display:block;}
@@ -51,28 +49,26 @@
             transform:translate(-50%,-50%);
             background:rgba(0,0,0,0.85);
             color:#fff;
-            padding:20px 24px;       /* 🔹 調整內邊距，原本是 20px 40px */
+            padding:20px 24px;
             border-radius:16px;
-            width:70%;                /* 🔹 設定提示框寬度 */
-            max-width:360px;          /* 🔹 設定最大寬度避免太寬 */
+            width:70%;
+            max-width:360px;
             font-size:1.05rem;
             font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
             text-align:center;
-            line-height:1.4;          /* 🔹 調整行高 */
+            line-height:1.4;
             z-index:9999;
             opacity:0;
-            transition:opacity 0.3s ease;
-        }
-        /* 子文字樣式 */
-        #hintBox .sub{
-            display:block;
-            margin-top:10px;           /* 🔹 減少子文字與主文字的距離 */
-            font-size:0.75rem;
-            opacity:0.75;
+            transition:opacity 0.3s ease; /* 預設顯示速度 */
         }
         #hintBox.show{
             display:block;
-            opacity:1;
+        }
+        #hintBox .sub{
+            display:block;
+            margin-top:10px;
+            font-size:0.75rem;
+            opacity:0.75;
         }
     }
 </style>
@@ -110,19 +106,40 @@ setInterval(()=>{
     showFirst = !showFirst;
 }, 650);
 
-// ====== 提示框：雙擊開啟、單擊關閉 ======
+// ====== 提示框動畫顯示/隱藏 ======
 const hintBox = document.getElementById('hintBox');
 const mobileArea = document.getElementById('mobileArea');
 
+// 顯示提示框（漸入 0.3s）
+function showHint(){
+    hintBox.style.transition = 'opacity 0.3s ease';
+    hintBox.style.display = 'block';
+    requestAnimationFrame(()=>{ // 確保樣式刷新
+        hintBox.style.opacity = '1';
+    });
+}
+
+// 隱藏提示框（漸出 0.5s）
+function hideHint(){
+    hintBox.style.transition = 'opacity 0.5s ease';
+    hintBox.style.opacity = '0';
+    hintBox.addEventListener('transitionend', function handler(){
+        hintBox.style.display = 'none';
+        hintBox.removeEventListener('transitionend', handler);
+    });
+}
+
+// 雙擊開啟
 mobileArea.addEventListener('dblclick', e=>{
     if(!e.target.closest('#hintBox')){
-        hintBox.classList.add('show');
+        showHint();
     }
 });
 
+// 單擊關閉
 mobileArea.addEventListener('click', e=>{
-    if(hintBox.classList.contains('show') && !e.target.closest('#hintBox')){
-        hintBox.classList.remove('show');
+    if(hintBox.style.opacity === '1' && !e.target.closest('#hintBox')){
+        hideHint();
     }
 });
 </script>
