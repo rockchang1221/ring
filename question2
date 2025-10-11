@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5201｜Question1</title>
+<style>
+    html,body{
+        margin:0;
+        padding:0;
+        background:#000;
+    }
+
+    /* 電腦版顯示提示文字 */
+    @media (min-width:768px){
+        .mobileOnly{display:none;}
+        .desktopMsg{
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            height:100vh;
+            color:#fff;
+            font-size:2rem;
+            font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+        }
+    }
+
+    /* 手機版顯示圖檔輪播 */
+    @media (max-width:767px){
+        .desktopMsg{display:none;}
+        .mobileOnly{
+            width:100%;
+            background:#000;
+            position:relative;
+            overflow-x:hidden;
+        }
+        .mobileOnly img{
+            width:100%;
+            height:auto;
+        }
+        .hide{display:none;}
+        .show{display:block;}
+
+        /* 提示框樣式 */
+        #hintBox{
+            display:none;
+            position:fixed;
+            top:50%; left:50%;
+            transform:translate(-50%,-50%);
+            background:rgba(0,0,0,0.85);
+            color:#fff;
+            padding:20px 24px;
+            border-radius:16px;
+            width:70%;
+            max-width:360px;
+            font-size:1.05rem;
+            font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
+            text-align:center;
+            line-height:1.4;
+            z-index:9999;
+            opacity:0;
+            transition:opacity 0.3s ease; /* 預設顯示速度 */
+        }
+        #hintBox.show{
+            display:block;
+        }
+        #hintBox .sub{
+            display:block;
+            margin-top:10px;
+            font-size:0.75rem;
+            opacity:0.75;
+        }
+    }
+</style>
+</head>
+<body>
+Q2
+<!-- 電腦提示 -->
+<div class="desktopMsg">咦？只能用手機看喔</div>
+
+<!-- 手機版輪播區 -->
+<div class="mobileOnly" id="mobileArea">
+    <img id="img1" src="QuestionPage/Q2-A.png" class="show">
+    <img id="img2" src="QuestionPage/Q2-B.png" class="hide">
+</div>
+
+<!-- 浮動提示框 -->
+<div id="hintBox">
+    蛤？？？這題還要看提示？<br>這是送分題欸😌
+    <span class="sub">點擊螢幕任意一處即可關閉提示</span>
+</div>
+
+<script>
+// ====== 兩張圖輪播 ======
+const img1 = document.getElementById('img1');
+const img2 = document.getElementById('img2');
+let showFirst = true;
+setInterval(()=>{
+    if(showFirst){
+        img1.classList.replace('show','hide');
+        img2.classList.replace('hide','show');
+    }else{
+        img1.classList.replace('hide','show');
+        img2.classList.replace('show','hide');
+    }
+    showFirst = !showFirst;
+}, 650);
+
+// ====== 提示框動畫顯示/隱藏 ======
+const hintBox = document.getElementById('hintBox');
+const mobileArea = document.getElementById('mobileArea');
+
+// 顯示提示框（漸入 0.3s）
+function showHint(){
+    hintBox.style.transition = 'opacity 0.3s ease';
+    hintBox.style.display = 'block';
+    requestAnimationFrame(()=>{ // 確保樣式刷新
+        hintBox.style.opacity = '1';
+    });
+}
+
+// 隱藏提示框（漸出 0.5s）
+function hideHint(){
+    hintBox.style.transition = 'opacity 0.5s ease';
+    hintBox.style.opacity = '0';
+    hintBox.addEventListener('transitionend', function handler(){
+        hintBox.style.display = 'none';
+        hintBox.removeEventListener('transitionend', handler);
+    });
+}
+
+// 雙擊開啟
+mobileArea.addEventListener('dblclick', e=>{
+    if(!e.target.closest('#hintBox')){
+        showHint();
+    }
+});
+
+// 單擊關閉
+mobileArea.addEventListener('click', e=>{
+    if(hintBox.style.opacity === '1' && !e.target.closest('#hintBox')){
+        hideHint();
+    }
+});
+</script>
+
+</body>
+</html>
