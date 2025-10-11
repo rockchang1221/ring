@@ -11,7 +11,7 @@
         background:#000;
     }
 
-    /* 電腦版顯示提示文字 */
+    /* ===== 電腦版樣式 ===== */
     @media (min-width:768px){
         .mobileOnly{display:none;}
         .desktopMsg{
@@ -23,9 +23,11 @@
             font-size:2rem;
             font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
         }
+        /* 電腦版隱藏提示框 */
+        #hintBox{display:none !important;}
     }
 
-    /* 手機版顯示圖檔輪播 */
+    /* ===== 手機版樣式 ===== */
     @media (max-width:767px){
         .desktopMsg{display:none;}
         .mobileOnly{
