@@ -44,6 +44,9 @@ html, body {
     color: #fff;
     cursor: pointer;
 }
+#question {
+    margin-bottom: 15px;
+}
 
 /* ====== 煙火區 ====== */
 #fireworkSection {
@@ -98,8 +101,9 @@ html, body {
 <!-- 首頁：輸入密碼 -->
 <section id="loginSection">
     <h2>輸入密碼解鎖驚喜 ✨</h2>
+    <div id="question"></div>
     <div>
-        <input type="text" id="codeInput" placeholder="輸入密碼">
+        <input type="text" id="codeInput" placeholder="輸入答案">
         <button id="submitBtn">確認</button>
     </div>
 </section>
@@ -112,26 +116,39 @@ html, body {
     </div>
 </section>
 
-<!-- ✅ 背景音樂檔案（請替換檔名/路徑） -->
+<!-- ✅ 音效與音樂 -->
 <audio id="fireworkMusic" src="人間煙火.MP3" loop></audio>
-
-<!-- ✅ 百花齊放音效（首次百花齊放時播放一次） -->
 <audio id="fireworkSound" src="firework_boom.MP3"></audio>
-
-<!-- ✅ 單發煙火音效（每次手動點擊煙火都會播放） -->
 <audio id="singleFireSound" src="single_fire.MP3"></audio>
 
 <script>
+// ====== 題庫設定 ======
+// 🔹 格式：卡片編號 : 正確答案
+const questionBank = {
+    "RR-00035": "5201",
+    "RR-00042": "LIFE",
+    "RR-00057": "ROCK",
+    "RR-00063": "LOVE"
+};
+
+// 隨機抽出一題
+const questionKeys = Object.keys(questionBank);
+const randomKey = questionKeys[Math.floor(Math.random() * questionKeys.length)];
+const correctAnswer = questionBank[randomKey];
+
+// 顯示題目
+document.getElementById("question").innerHTML = `請問 「${randomKey}」 的答案是？`;
+
 // ====== 密碼檢查 ======
 function checkPassword() {
     const code = document.getElementById('codeInput').value.trim();
-    if(code.toUpperCase() === "5201"){ 
+    if(code.toUpperCase() === correctAnswer.toUpperCase()){ 
         document.getElementById('loginSection').style.display = "none";
         document.getElementById('fireworkSection').style.display = "block";
         startFireworks();
-        enableSparkMode(); // ✅ 密碼正確後再啟動滑鼠小花火
+        enableSparkMode();
     } else {
-        alert("密碼錯誤，再試試！");
+        alert("答案錯誤，再試試！");
     }
 }
 document.getElementById('submitBtn').addEventListener('click', checkPassword);
@@ -139,20 +156,19 @@ document.getElementById('codeInput').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') checkPassword();
 });
 
-// ====== 畫布設定 ======
+// ====== 煙火設定 ======
 const canvas = document.getElementById('fireworkCanvas');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let particles = [];
-let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"]; // 主煙火顏色
+let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
 let autoFireworkStarted = false;
 let musicStarted = false;
 let firstClick = true;
-let sparkMode = false; // ✅ 控制小花火啟動狀態
+let sparkMode = false;
 
-// ====== 煙火 ======
 function createFirework(x, y, withText=false) {
     for(let i=0;i<40;i++){
         const speed = Math.random()*6 + 2;
@@ -175,7 +191,6 @@ function createFirework(x, y, withText=false) {
     }
 }
 
-// 🎇 滑鼠引線火花
 function createSpark(x, y){
     for(let i=0;i<10;i++){
         const speed = Math.random()*1.0 + 0.3;
@@ -191,9 +206,8 @@ function createSpark(x, y){
     }
 }
 
-// ====== 彩蛋文字 ======
-const myWords = ["","","",""];
-const herWords = ["","","",""];
+const myWords = ["",""];
+const herWords = ["",""];
 function showFireText(x, y){
     const text = document.createElement("div");
     text.className = "fireText";
@@ -208,7 +222,6 @@ function showFireText(x, y){
     setTimeout(()=>{ text.remove(); },1500);
 }
 
-// ====== 動畫 loop ======
 function animate() {
     ctx.fillStyle = "rgba(0,0,0,0.2)";
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -229,24 +242,17 @@ function animate() {
 }
 function startFireworks(){ animate(); }
 
-// ====== 點擊煙火 ======
 canvas.addEventListener('click', (e)=>{
-    // ✅ 單發煙火音效（每次手動點擊都播放）
     const singleBoom = document.getElementById('singleFireSound');
     singleBoom.currentTime = 0;
     singleBoom.play();
-
     createFirework(e.clientX, e.clientY, true);
 
     if(firstClick){
         firstClick = false;
-
-        // ✅ 播放百花齊放音效（只播一次）
         const boom = document.getElementById('fireworkSound');
         boom.currentTime = 0;
         boom.play();
-
-        // ✅ 百花齊放
         for(let i=0; i<50; i++){
             setTimeout(()=>{
                 createFirework(
@@ -266,7 +272,7 @@ canvas.addEventListener('click', (e)=>{
     }
 });
 
-// ====== 滑鼠引線火花（密碼解鎖後才啟動）======
+// ====== 滑鼠引線火花 ======
 let mouseX = null, mouseY = null;
 function enableSparkMode(){
     sparkMode = true;
@@ -283,12 +289,10 @@ setInterval(()=>{
     }
 },40);
 
-// ====== 視窗調整 ======
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
 </script>
-
 </body>
 </html>
