@@ -17,7 +17,7 @@
                         'rose-gold': '#F4C4C4',
                         'star-pink': '#FF7EB3',
                         'tech-cyan': '#7AF8FF',
-                        'deep-blue': '#1a1b3c', // 星光海克斯的深色背景底色
+                        'deep-blue': '#1a1b3c',
                     },
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
@@ -28,12 +28,16 @@
                         'glow': '0 0 15px rgba(255, 126, 179, 0.3)',
                     },
                     animation: {
-                        // 內容區塊的浮動效果
+                        /* 這裡的動畫時間是繼承 CSS class 的，不用改這裡 */
+                        'bg-cycle': 'bgCycle steps(1) infinite', 
                         'float': 'float 6s ease-in-out infinite',
-                        // 提示視窗的彈出效果
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                     },
                     keyframes: {
+                        bgCycle: {
+                            '0%, 50%': { opacity: '1' }, 
+                            '51%, 100%': { opacity: '0' }
+                        },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-5px)' },
@@ -48,35 +52,34 @@
         }
     </script>
     <style>
-        /* 設定頁面基本樣式 */
         body {
-            background-color: #1a1b3c; /* 預設深色背景，避免圖片載入前出現白底 */
+            background-color: #000;
             color: #fff;
-            /* 允許垂直捲動，但禁止水平捲動 */
             overflow-x: hidden;
             overflow-y: auto;
-            /* 優化觸控操作 */
             touch-action: manipulation;
-            /* 強制頁面最小高度為 2500px，確保能容納完整背景 */
-            min-height: 2500px;
+            
+            /* [調整重點 1] 頁面最小高度 */
+            /* 如果覺得太長，把 2500px 改小，例如 1500px */
+            min-height: 1500px;
+            
             position: relative;
         }
 
-        /* 背景動畫定義 */
         @keyframes bgCycle1 {
-            0%, 45% { opacity: 1; } /* 顯示 */
-            55%, 100% { opacity: 0; } /* 隱藏 */
+            0%, 45% { opacity: 1; }
+            55%, 100% { opacity: 0; }
         }
         @keyframes bgCycle2 {
-            0%, 45% { opacity: 0; } /* 隱藏 */
-            55%, 100% { opacity: 1; } /* 顯示 */
+            0%, 45% { opacity: 0; }
+            55%, 100% { opacity: 1; }
         }
 
-        /* 應用動畫到背景圖層 */
-        .animate-bg-1 { animation: bgCycle1 3s infinite; }
-        .animate-bg-2 { animation: bgCycle2 3s infinite; }
+        /* [調整重點 2] 輪播速度 */
+        /* 目前設為 0.8s。想要快一點改小 (0.5s)，想要慢一點改大 (1.5s) */
+        .animate-bg-1 { animation: bgCycle1 0.8s infinite steps(1); }
+        .animate-bg-2 { animation: bgCycle2 0.8s infinite steps(1); }
 
-        /* 背景容器：絕對定位，填滿整個頁面高度 */
         .bg-container {
             position: absolute;
             top: 0;
@@ -87,23 +90,18 @@
             overflow: hidden;
         }
         
-        /* 背景圖片通用樣式 */
         .bg-image {
             position: absolute;
             inset: 0;
-            background-position: center top; /* 從頂部開始顯示 */
+            background-position: center top;
             background-repeat: no-repeat;
-            /* 讓寬度符合螢幕，高度自動依比例縮放，確保完整顯示 */
             background-size: 100% auto; 
         }
         
-        /* 指定背景圖片路徑 */
         #bg-1 { background-image: url('bk-1.png'); }
         #bg-2 { background-image: url('bk-2.png'); }
 
-        /* 玻璃面板樣式 */
         .glass-panel {
-            /* 使用深藍紫色半透明基底，符合星光海克斯主題 */
             background: rgba(26, 27, 60, 0.8); 
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -114,7 +112,6 @@
             position: relative;
         }
 
-        /* 提示視窗樣式 */
         #hint-modal {
             display: none; 
             position: fixed;
@@ -125,10 +122,9 @@
             z-index: 50;
         }
         
-        /* 選項按鈕樣式 */
         .option-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(122, 248, 255, 0.2); /* 使用科技青色邊框 */
+            border: 1px solid rgba(122, 248, 255, 0.2);
             transition: all 0.2s;
         }
         .option-btn:active {
@@ -137,26 +133,22 @@
         }
     </style>
 </head>
-<!-- 移除 flex center，改用 padding-top 來定位內容 -->
 <body ondblclick="showHint()">
 
-    <!-- 背景圖層 -->
     <div class="bg-container">
-        <!-- 兩張圖片疊加，透過動畫交替透明度 -->
         <div id="bg-2" class="bg-image animate-bg-2"></div>
         <div id="bg-1" class="bg-image animate-bg-1"></div>
-        <!-- 深色遮罩，增加文字可讀性並統一色調 -->
-        <div class="absolute inset-0 bg-[#1a1b3c]/60 z-10"></div>
     </div>
 
-    <!-- 內容容器：使用 mx-auto 水平置中，pt-24 留出頂部空間 -->
-    <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-5 px-6 pt-24">
+    <!-- [調整重點 3 & 4] 內容容器 -->
+    <!-- pt-10: 控制距離頂部的距離 (Padding Top)。想再往上一點改 pt-6，想往下改 pt-16 -->
+    <!-- gap-3: 控制兩個方塊之間的距離 (Gap)。想近一點改 gap-2，想遠一點改 gap-5 -->
+    <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-3 px-6 pt-10">
 
-        <!-- 區塊一：行程資訊 -->
+        <!-- 區塊一 -->
         <div class="glass-panel p-5 animate-float">
             <div class="absolute -top-1 -right-1 w-20 h-20 bg-star-pink/20 blur-2xl rounded-full pointer-events-none"></div>
 
-            <!-- 上半部 -->
             <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
                 <div class="flex flex-col">
                     <span class="text-[10px] font-mono text-rose-gold/80 tracking-widest uppercase">Meet NO.</span>
@@ -168,18 +160,12 @@
                 </div>
             </div>
 
-            <!-- 下半部：地點 -->
             <div class="flex items-start justify-between w-full">
-                
-                <!-- From -->
                 <div class="flex flex-col flex-none items-start">
                     <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">From</span>
-                    <span class="text-xl font-bold text-white leading-tight">
-                        臺中
-                    </span>
+                    <span class="text-xl font-bold text-white leading-tight">臺中</span>
                 </div>
 
-                <!-- To -->
                 <div class="flex flex-col flex-1 items-end min-w-0">
                     <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">To</span>
                     <span class="text-xl font-bold text-white text-right leading-tight whitespace-nowrap w-full">
@@ -189,9 +175,8 @@
             </div>
         </div>
 
-        <!-- 區塊二：問題區 -->
+        <!-- 區塊二 -->
         <div class="glass-panel p-6 pb-6 border-rose-gold/30 shadow-glow">
-            
             <div class="mb-5">
                 <span class="text-xs font-mono text-tech-cyan tracking-widest border-b border-tech-cyan/20 pb-1">Question 1.</span>
                 <h2 class="text-xl font-bold text-white mt-3 leading-relaxed tracking-wide">
@@ -225,12 +210,11 @@
                     <span>螢幕點兩下或許會有提示？</span>
                 </p>
             </div>
-
         </div>
 
-        <!-- 強制佔位容器：確保頁面有足夠的捲動空間來顯示完整背景 -->
-        <!-- 高度設為 1800px，加上上面的內容，總高度會超過 2500px -->
-        <div class="w-full h-[1800px] shrink-0"></div>
+        <!-- [調整重點 5] 底部佔位空間 -->
+        <!-- h-[800px]: 控制捲動的額外長度。覺得太長就改小，例如 h-[500px] -->
+        <div class="w-full h-[800px] shrink-0"></div>
 
     </div>
 
@@ -254,7 +238,6 @@
         let lastTap = 0;
         let isModalInteractable = false; 
 
-        // 手機雙擊偵測
         document.addEventListener('touchend', function (e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
@@ -265,7 +248,6 @@
             lastTap = currentTime;
         });
         
-        // 電腦雙擊測試
         document.addEventListener('dblclick', function(e) {
              showHint();
         });
@@ -275,7 +257,6 @@
 
             hintModal.style.display = 'block';
             isModalInteractable = false;
-            // 500ms 延遲，防止誤觸關閉
             setTimeout(() => {
                 isModalInteractable = true;
             }, 500);
@@ -295,8 +276,6 @@
                 hintModal.style.transition = '';
             }, 300);
         }
-
-        console.log("Star Guardian Protocol: Full Height Background Edition.");
     </script>
 </body>
 </html>
