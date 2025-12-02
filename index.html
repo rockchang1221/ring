@@ -1,321 +1,288 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>彩蛋頁面</title>
-
-<link rel="icon" href="favicon/favicon-64.ico">
-<link rel="apple-touch-icon" href="favicon/favicon-64.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Question Protocol: 01</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
-<style>
-html, body {
-    margin: 0;
-    padding: 0;
-    background: #000;
-    color: #fff;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    overflow-x: hidden;
-}
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'rose-gold': '#F4C4C4',
+                        'star-pink': '#FF7EB3',
+                        'tech-cyan': '#7AF8FF',
+                        'deep-blue': '#1a1b3c',
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        mono: ['"Space Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.3)',
+                        'glow': '0 0 15px rgba(255, 126, 179, 0.3)',
+                    },
+                    animation: {
+                        'bg-cycle': 'bgCycle 0.5s steps(1) infinite', // 加速到 0.5s
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    },
+                    keyframes: {
+                        bgCycle: {
+                            '0%, 50%': { opacity: '1' }, 
+                            '51%, 100%': { opacity: '0' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.8) translate(-50%, -50%)' },
+                            '100%': { opacity: '1', transform: 'scale(1) translate(-50%, -50%)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            /* 預設背景設為透明或接近圖片底色，避免閃爍時出現白底 */
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            overflow-y: auto;
+            touch-action: manipulation;
+            min-height: 2500px;
+            position: relative;
+        }
 
-/* ====== 首頁 (密碼輸入區) ====== */
-#loginSection {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-}
-#codeInput {
-    padding: 10px 15px;
-    font-size: 1.2rem;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-}
-#submitBtn {
-    padding: 10px 15px;
-    font-size: 1.2rem;
-    margin-left: 10px;
-    border-radius: 8px;
-    border: none;
-    background: #ff5e5e;
-    color: #fff;
-    cursor: pointer;
-}
-#question {
-    margin-bottom: 15px;
-}
+        /* 背景動畫定義 */
+        @keyframes bgCycle1 {
+            0%, 45% { opacity: 1; }
+            55%, 100% { opacity: 0; }
+        }
+        @keyframes bgCycle2 {
+            0%, 45% { opacity: 0; }
+            55%, 100% { opacity: 1; }
+        }
 
-/* ====== 煙火區 ====== */
-#fireworkSection {
-    display: none;
-    width: 100%;
-    height: 100vh;
-    position: relative;
-    text-align: center;
-    overflow: hidden;
-}
-#fireworkCanvas {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-#fireworkMessage {
-    position: relative;
-    z-index: 1;
-    top: 40%;
-    font-size: 1.3rem;
-    text-align: center;
-    line-height: 2rem;
-    transition: opacity 0.5s ease;
-}
-#fireworkMessage.hidden {
-    opacity: 0;
-    pointer-events: none;
-}
+        /* 0.5s 的快速切換 */
+        .animate-bg-1 { animation: bgCycle1 0.5s infinite steps(1); }
+        .animate-bg-2 { animation: bgCycle2 0.5s infinite steps(1); }
 
-/* 點擊煙火文字 */
-.fireText {
-    position: absolute;
-    color: #fff;
-    font-size: 1rem;
-    pointer-events: none;
-    white-space: nowrap;
-    text-shadow: 0 0 5px rgba(255,255,255,0.8);
-    animation: fadeUp 1.5s forwards;
-    left: 50%;
-    transform: translateX(-50%);
-}
-@keyframes fadeUp {
-    0% {opacity:1; transform: translate(-50%,0);}
-    100% {opacity:0; transform: translate(-50%,-60px);}
-}
-</style>
+        .bg-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .bg-image {
+            position: absolute;
+            inset: 0;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-size: 100% auto; 
+        }
+        
+        #bg-1 { background-image: url('bk-1.png'); }
+        #bg-2 { background-image: url('bk-2.png'); }
+
+        .glass-panel {
+            background: rgba(26, 27, 60, 0.8); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            width: 100%; 
+            position: relative;
+        }
+
+        #hint-modal {
+            display: none; 
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 320px;
+            z-index: 50;
+        }
+        
+        .option-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(122, 248, 255, 0.2);
+            transition: all 0.2s;
+        }
+        .option-btn:active {
+            background: rgba(122, 248, 255, 0.2);
+            transform: scale(0.98);
+        }
+    </style>
 </head>
-<body>
+<body ondblclick="showHint()">
 
-<!-- 首頁：輸入密碼 -->
-<section id="loginSection">
-    <h2>輸入密碼解鎖驚喜 ✨</h2>
-    <div id="question"></div>
-    <div>
-        <input type="text" id="codeInput" placeholder="輸入答案">
-        <button id="submitBtn">確認</button>
+    <!-- 背景圖層 -->
+    <div class="bg-container">
+        <!-- 直接顯示圖片，沒有任何遮罩 div -->
+        <div id="bg-2" class="bg-image animate-bg-2"></div>
+        <div id="bg-1" class="bg-image animate-bg-1"></div>
     </div>
-</section>
 
-<!-- 煙火區 -->
-<section id="fireworkSection">
-    <canvas id="fireworkCanvas"></canvas>
-    <div id="fireworkMessage">
-        <div>點看看螢幕會發生什麼事👀</div>
+    <!-- 內容容器 -->
+    <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-5 px-6 pt-24">
+
+        <!-- 區塊一：行程資訊 -->
+        <div class="glass-panel p-5 animate-float">
+            <div class="absolute -top-1 -right-1 w-20 h-20 bg-star-pink/20 blur-2xl rounded-full pointer-events-none"></div>
+
+            <!-- 上半部 -->
+            <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
+                <div class="flex flex-col">
+                    <span class="text-[10px] font-mono text-rose-gold/80 tracking-widest uppercase">Meet NO.</span>
+                    <span class="text-xl font-mono font-bold text-white tracking-wider">RR-00019</span>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-[10px] font-mono text-rose-gold/80 tracking-widest uppercase">Date</span>
+                    <span class="text-xl font-mono font-bold text-white">2024-09-28</span>
+                </div>
+            </div>
+
+            <!-- 下半部 -->
+            <div class="flex items-start justify-between w-full">
+                
+                <!-- From -->
+                <div class="flex flex-col flex-none items-start">
+                    <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">From</span>
+                    <span class="text-xl font-bold text-white leading-tight">
+                        臺中
+                    </span>
+                </div>
+
+                <!-- To -->
+                <div class="flex flex-col flex-1 items-end min-w-0">
+                    <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">To</span>
+                    <span class="text-xl font-bold text-white text-right leading-tight whitespace-nowrap w-full">
+                        新店誠品黑盒歌舞廳
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 區塊二：問題區 -->
+        <div class="glass-panel p-6 pb-6 border-rose-gold/30 shadow-glow">
+            
+            <div class="mb-5">
+                <span class="text-xs font-mono text-tech-cyan tracking-widest border-b border-tech-cyan/20 pb-1">Question 1.</span>
+                <h2 class="text-xl font-bold text-white mt-3 leading-relaxed tracking-wide">
+                    我們第一次見面的日期是？
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6 font-mono text-sm">
+                <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
+                    <span class="text-tech-cyan mr-1">(A)</span> 5/20
+                </button>
+                <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
+                    <span class="text-tech-cyan mr-1">(B)</span> 2/30
+                </button>
+                <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
+                    <span class="text-tech-cyan mr-1">(C)</span> 9/28
+                </button>
+                <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
+                    <span class="text-tech-cyan mr-1">(D)</span> 12/32
+                </button>
+            </div>
+
+            <div class="text-center pt-2 border-t border-white/5">
+                <p class="text-[10px] text-gray-400 font-light flex flex-col items-center justify-center gap-1 opacity-70">
+                    <span class="flex items-center gap-1">
+                        <svg class="w-3 h-3 text-yellow-400 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                        </svg>
+                        不知道答案？唉...真糟糕。
+                    </span>
+                    <span>螢幕點兩下或許會有提示？</span>
+                </p>
+            </div>
+
+        </div>
+
+        <!-- 佔位容器 -->
+        <div class="w-full h-[1800px] shrink-0"></div>
+
     </div>
-</section>
 
-<!-- ✅ 音效與音樂 -->
-<audio id="fireworkMusic" src="人間煙火.MP3" loop></audio>
-<audio id="fireworkSound" src="firework_boom.MP3"></audio>
-<audio id="singleFireSound" src="single_fire.MP3"></audio>
+    <!-- 提示視窗 -->
+    <div id="hint-modal" class="glass-panel border-tech-cyan/50 p-6 text-center animate-pop-in cursor-pointer" onclick="closeHint()">
+        <div class="w-12 h-12 rounded-full bg-tech-cyan/20 flex items-center justify-center mx-auto mb-3 shadow-[0_0_15px_rgba(122,248,255,0.3)]">
+            <span class="text-2xl">🤫</span>
+        </div>
+        <h3 class="text-lg font-bold text-white mb-2 tracking-wide">秘密提示</h3>
+        <p class="text-sm text-gray-300 leading-relaxed mb-4">
+            還記得那天妳穿了一件黑色的外套，<br>
+            我們約在誠品樓下...
+        </p>
+        <div class="text-[10px] font-mono text-tech-cyan/60 uppercase tracking-widest border-t border-white/10 pt-2 mt-2">
+            Tap to Close
+        </div>
+    </div>
 
-<script>
-// ====== 題庫設定 ======
-// 🔹 格式：卡片編號 : 正確答案
-const questionBank = {
-    "RR-00019": "C",
-    "RR-00020": "C",
-    "RR-00021": "C",
-    "RR-00022": "C",
-    "RR-00023": "C",
-    "RR-00024": "C",
-    "RR-00025": "C",
-    "RR-00026": "C",
-    "RR-00027": "C",
-    "RR-00028": "C",
-    "RR-00029": "C",
-    "RR-00030": "C",
-    "RR-00031": "C",
-    "RR-00032": "C",
-    "RR-00033": "C",
-    "RR-00034": "C",
-    "RR-00035": "C",
-    "RR-00036": "C",
-    "RR-00037": "C",
-    "RR-00038": "C",
-    "RR-00039": "C",
-    "RR-00040": "C",
-    "RR-00041": "C",
-    "RR-00042": "C",
-    "RR-00043": "C",
-    "RR-00044": "C",
-    "RR-00045": "C"
-};
+    <script>
+        const hintModal = document.getElementById('hint-modal');
+        let lastTap = 0;
+        let isModalInteractable = false; 
 
-// 隨機抽出一題
-const questionKeys = Object.keys(questionBank);
-const randomKey = questionKeys[Math.floor(Math.random() * questionKeys.length)];
-const correctAnswer = questionBank[randomKey];
-
-// 顯示題目
-document.getElementById("question").innerHTML = `請問 「${randomKey}」 的答案是？`;
-
-// ====== 密碼檢查 ======
-function checkPassword() {
-    const code = document.getElementById('codeInput').value.trim();
-    if(code.toUpperCase() === correctAnswer.toUpperCase()){ 
-        document.getElementById('loginSection').style.display = "none";
-        document.getElementById('fireworkSection').style.display = "block";
-        startFireworks();
-        enableSparkMode();
-    } else {
-        alert("答案錯誤，再試試！");
-    }
-}
-document.getElementById('submitBtn').addEventListener('click', checkPassword);
-document.getElementById('codeInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') checkPassword();
-});
-
-// ====== 煙火設定 ======
-const canvas = document.getElementById('fireworkCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-let colors = ["#ff5e5e","#ffd15c","#6effa1","#5ec2ff","#d25cff"];
-let autoFireworkStarted = false;
-let musicStarted = false;
-let firstClick = true;
-let sparkMode = false;
-
-function createFirework(x, y, withText=false) {
-    for(let i=0;i<40;i++){
-        const speed = Math.random()*6 + 2;
-        const angle = Math.random()*Math.PI*2;
-        particles.push({
-            x: x, y: y,
-            vx: Math.cos(angle)*speed,
-            vy: Math.sin(angle)*speed,
-            alpha: 1,
-            size: 3,
-            color: colors[Math.floor(Math.random()*colors.length)]
+        document.addEventListener('touchend', function (e) {
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTap;
+            if (tapLength < 400 && tapLength > 0) {
+                showHint();
+                e.preventDefault();
+            }
+            lastTap = currentTime;
         });
-    }
-    if(withText){
-        showFireText(x, y);
-        if(!musicStarted){
-            musicStarted = true;
-            document.getElementById('fireworkMusic').play();
-        }
-    }
-}
-
-function createSpark(x, y){
-    for(let i=0;i<10;i++){
-        const speed = Math.random()*1.0 + 0.3;
-        const angle = Math.random()*Math.PI*2;
-        particles.push({
-            x: x, y: y,
-            vx: Math.cos(angle)*speed,
-            vy: Math.sin(angle)*speed,
-            alpha: 1,
-            size: 1.2,
-            color: Math.random() < 0.5 ? "#ffffff" : "#cccccc"
+        
+        document.addEventListener('dblclick', function(e) {
+             showHint();
         });
-    }
-}
 
-const myWords = ["",""];
-const herWords = ["",""];
-function showFireText(x, y){
-    const text = document.createElement("div");
-    text.className = "fireText";
-    text.style.left = x + "px"; 
-    text.style.top = y + "px";
-    if(x < canvas.width/2){
-        text.textContent = myWords[Math.floor(Math.random()*myWords.length)];
-    } else {
-        text.textContent = herWords[Math.floor(Math.random()*herWords.length)];
-    }
-    document.body.appendChild(text);
-    setTimeout(()=>{ text.remove(); },1500);
-}
+        function showHint() {
+            if(hintModal.style.display === 'block') return;
 
-function animate() {
-    ctx.fillStyle = "rgba(0,0,0,0.2)";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
-    for(let i=0;i<particles.length;i++){
-        const p = particles[i];
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-        ctx.fillStyle = p.color;
-        ctx.globalAlpha = p.alpha;
-        ctx.fill();
-        p.x += p.vx;
-        p.y += p.vy;
-        p.alpha -= 0.02;
-        if(p.alpha <= 0) particles.splice(i,1);
-    }
-    ctx.globalAlpha = 1;
-    requestAnimationFrame(animate);
-}
-function startFireworks(){ animate(); }
-
-canvas.addEventListener('click', (e)=>{
-    const singleBoom = document.getElementById('singleFireSound');
-    singleBoom.currentTime = 0;
-    singleBoom.play();
-    createFirework(e.clientX, e.clientY, true);
-
-    if(firstClick){
-        firstClick = false;
-        const boom = document.getElementById('fireworkSound');
-        boom.currentTime = 0;
-        boom.play();
-        for(let i=0; i<50; i++){
-            setTimeout(()=>{
-                createFirework(
-                    Math.random()*canvas.width,
-                    Math.random()*canvas.height/2 + canvas.height/4
-                );
-            }, i*30);
+            hintModal.style.display = 'block';
+            isModalInteractable = false;
+            setTimeout(() => {
+                isModalInteractable = true;
+            }, 500);
         }
-    }
 
-    if(!autoFireworkStarted){
-        autoFireworkStarted = true;
-        document.getElementById("fireworkMessage").classList.add("hidden");
-        setInterval(()=>{
-            createFirework(Math.random()*canvas.width, Math.random()*canvas.height/2 + canvas.height/4);
-        },400);
-    }
-});
+        function closeHint() {
+            if (!isModalInteractable) return;
 
-// ====== 滑鼠引線火花 ======
-let mouseX = null, mouseY = null;
-function enableSparkMode(){
-    sparkMode = true;
-}
-document.addEventListener('mousemove',(e)=>{
-    if(sparkMode && window.innerWidth > 768){
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    }
-});
-setInterval(()=>{
-    if(sparkMode && mouseX!==null && window.innerWidth > 768){
-        createSpark(mouseX, mouseY);
-    }
-},40);
+            hintModal.style.opacity = '0';
+            hintModal.style.transform = 'translate(-50%, -40%) scale(0.95)';
+            hintModal.style.transition = 'all 0.3s ease';
+            
+            setTimeout(() => {
+                hintModal.style.display = 'none';
+                hintModal.style.opacity = '';
+                hintModal.style.transform = '';
+                hintModal.style.transition = '';
+            }, 300);
+        }
 
-window.addEventListener('resize', () => {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-});
-</script>
+        console.log("Star Guardian Protocol: No Overlay Edition.");
+    </script>
 </body>
 </html>
