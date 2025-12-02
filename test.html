@@ -17,7 +17,7 @@
                         'rose-gold': '#F4C4C4',
                         'star-pink': '#FF7EB3',
                         'tech-cyan': '#7AF8FF',
-                        'deep-blue': '#1a1b3c',
+                        'deep-blue': '#1a1b3c', // 星光海克斯的深色背景底色
                     },
                     fontFamily: {
                         sans: ['"Noto Sans TC"', 'sans-serif'],
@@ -28,16 +28,12 @@
                         'glow': '0 0 15px rgba(255, 126, 179, 0.3)',
                     },
                     animation: {
-                        'bg-cycle': 'bgCycle 1.5s steps(1) infinite', 
+                        // 內容區塊的浮動效果
                         'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        // 提示視窗的彈出效果
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
                     },
                     keyframes: {
-                        bgCycle: {
-                            '0%, 50%': { opacity: '1' }, 
-                            '51%, 100%': { opacity: '0' }
-                        },
                         float: {
                             '0%, 100%': { transform: 'translateY(0)' },
                             '50%': { transform: 'translateY(-5px)' },
@@ -52,43 +48,62 @@
         }
     </script>
     <style>
+        /* 設定頁面基本樣式 */
         body {
-            background-color: #000;
+            background-color: #1a1b3c; /* 預設深色背景，避免圖片載入前出現白底 */
             color: #fff;
-            overflow: hidden;
+            /* 允許垂直捲動，但禁止水平捲動 */
+            overflow-x: hidden;
+            overflow-y: auto;
+            /* 優化觸控操作 */
             touch-action: manipulation;
+            /* 強制頁面最小高度為 2500px，確保能容納完整背景 */
+            min-height: 2500px;
+            position: relative;
         }
 
+        /* 背景動畫定義 */
+        @keyframes bgCycle1 {
+            0%, 45% { opacity: 1; } /* 顯示 */
+            55%, 100% { opacity: 0; } /* 隱藏 */
+        }
+        @keyframes bgCycle2 {
+            0%, 45% { opacity: 0; } /* 隱藏 */
+            55%, 100% { opacity: 1; } /* 顯示 */
+        }
+
+        /* 應用動畫到背景圖層 */
+        .animate-bg-1 { animation: bgCycle1 3s infinite; }
+        .animate-bg-2 { animation: bgCycle2 3s infinite; }
+
+        /* 背景容器：絕對定位，填滿整個頁面高度 */
         .bg-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            background-color: #1a1b3c; /* 使用深藍色作為圖片外的背景 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
         }
         
+        /* 背景圖片通用樣式 */
         .bg-image {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-size: contain; /* 確保圖片完整呈現 */
-            background-position: center;
+            inset: 0;
+            background-position: center top; /* 從頂部開始顯示 */
             background-repeat: no-repeat;
+            /* 讓寬度符合螢幕，高度自動依比例縮放，確保完整顯示 */
+            background-size: 100% auto; 
         }
         
-        #bg-1 {
-            background-image: url('Q1-A.png'); 
-            z-index: 1;
-            animation: bgCycle 1.5s steps(1) infinite; 
-        }
-        #bg-2 {
-            background-image: url('bk-2.png'); 
-            z-index: 0;
-        }
+        /* 指定背景圖片路徑 */
+        #bg-1 { background-image: url('bk-1.png'); }
+        #bg-2 { background-image: url('bk-2.png'); }
 
-        /* Demo 用 (實際使用請刪除) */
-        /* #bg-1 { background-color: #2a2a2a; } */
-        #bg-2 { background-color: #1a1a1a; }
-
+        /* 玻璃面板樣式 */
         .glass-panel {
+            /* 使用深藍紫色半透明基底，符合星光海克斯主題 */
             background: rgba(26, 27, 60, 0.8); 
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -99,6 +114,7 @@
             position: relative;
         }
 
+        /* 提示視窗樣式 */
         #hint-modal {
             display: none; 
             position: fixed;
@@ -109,9 +125,10 @@
             z-index: 50;
         }
         
+        /* 選項按鈕樣式 */
         .option-btn {
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(122, 248, 255, 0.2);
+            border: 1px solid rgba(122, 248, 255, 0.2); /* 使用科技青色邊框 */
             transition: all 0.2s;
         }
         .option-btn:active {
@@ -120,17 +137,20 @@
         }
     </style>
 </head>
-<body class="min-h-screen w-full flex flex-col items-center justify-center" ondblclick="showHint()">
+<!-- 移除 flex center，改用 padding-top 來定位內容 -->
+<body ondblclick="showHint()">
 
     <!-- 背景圖層 -->
     <div class="bg-container">
-        <div id="bg-2" class="bg-image"></div>
-        <div id="bg-1" class="bg-image"></div>
-        <div class="absolute inset-0 bg-black/40 z-10"></div>
+        <!-- 兩張圖片疊加，透過動畫交替透明度 -->
+        <div id="bg-2" class="bg-image animate-bg-2"></div>
+        <div id="bg-1" class="bg-image animate-bg-1"></div>
+        <!-- 深色遮罩，增加文字可讀性並統一色調 -->
+        <div class="absolute inset-0 bg-[#1a1b3c]/60 z-10"></div>
     </div>
 
-    <!-- 內容容器 -->
-    <div class="relative z-20 w-full max-w-md flex flex-col gap-5 px-6 pb-10">
+    <!-- 內容容器：使用 mx-auto 水平置中，pt-24 留出頂部空間 -->
+    <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-5 px-6 pt-24">
 
         <!-- 區塊一：行程資訊 -->
         <div class="glass-panel p-5 animate-float">
@@ -148,8 +168,8 @@
                 </div>
             </div>
 
-            <!-- 下半部：地點 (已移除火車圖標) -->
-            <div class="flex items-center justify-between w-full">
+            <!-- 下半部：地點 -->
+            <div class="flex items-start justify-between w-full">
                 
                 <!-- From -->
                 <div class="flex flex-col flex-none items-start">
@@ -208,6 +228,10 @@
 
         </div>
 
+        <!-- 強制佔位容器：確保頁面有足夠的捲動空間來顯示完整背景 -->
+        <!-- 高度設為 1800px，加上上面的內容，總高度會超過 2500px -->
+        <div class="w-full h-[1800px] shrink-0"></div>
+
     </div>
 
     <!-- 提示視窗 -->
@@ -230,6 +254,7 @@
         let lastTap = 0;
         let isModalInteractable = false; 
 
+        // 手機雙擊偵測
         document.addEventListener('touchend', function (e) {
             const currentTime = new Date().getTime();
             const tapLength = currentTime - lastTap;
@@ -240,6 +265,7 @@
             lastTap = currentTime;
         });
         
+        // 電腦雙擊測試
         document.addEventListener('dblclick', function(e) {
              showHint();
         });
@@ -249,6 +275,7 @@
 
             hintModal.style.display = 'block';
             isModalInteractable = false;
+            // 500ms 延遲，防止誤觸關閉
             setTimeout(() => {
                 isModalInteractable = true;
             }, 500);
@@ -269,7 +296,7 @@
             }, 300);
         }
 
-        console.log("Star Guardian Protocol: Question Interface Finalized V3.");
+        console.log("Star Guardian Protocol: Full Height Background Edition.");
     </script>
 </body>
 </html>
