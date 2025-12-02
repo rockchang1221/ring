@@ -28,7 +28,6 @@
                         'glow': '0 0 15px rgba(255, 126, 179, 0.3)',
                     },
                     animation: {
-                        /* 這裡的動畫時間是繼承 CSS class 的，不用改這裡 */
                         'bg-cycle': 'bgCycle steps(1) infinite', 
                         'float': 'float 6s ease-in-out infinite',
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
@@ -58,11 +57,7 @@
             overflow-x: hidden;
             overflow-y: auto;
             touch-action: manipulation;
-            
-            /* [調整重點 1] 頁面最小高度 */
-            /* 如果覺得太長，把 2500px 改小，例如 1500px */
             min-height: 1500px;
-            
             position: relative;
         }
 
@@ -75,8 +70,6 @@
             55%, 100% { opacity: 1; }
         }
 
-        /* [調整重點 2] 輪播速度 */
-        /* 目前設為 0.8s。想要快一點改小 (0.5s)，想要慢一點改大 (1.5s) */
         .animate-bg-1 { animation: bgCycle1 0.8s infinite steps(1); }
         .animate-bg-2 { animation: bgCycle2 0.8s infinite steps(1); }
 
@@ -131,19 +124,65 @@
             background: rgba(122, 248, 255, 0.2);
             transform: scale(0.98);
         }
+
+        /* ====== [新增] 電腦版警示畫面樣式 ====== */
+        #desktop-warning {
+            display: none; /* 預設隱藏 */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: #1a1b3c;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* ====== [新增] Media Query 強制手機版 ====== */
+        @media (min-width: 769px) {
+            /* 隱藏主要內容 */
+            .bg-container, 
+            .mobile-content-wrapper, /* 下面會把主要內容包在這個 class 裡 */
+            #hint-modal {
+                display: none !important;
+            }
+            
+            /* 顯示警示畫面 */
+            #desktop-warning {
+                display: flex !important;
+            }
+
+            /* 重置 body 樣式以免捲動 */
+            body {
+                overflow: hidden !important;
+                min-height: 100vh !important;
+                background-color: #1a1b3c;
+            }
+        }
     </style>
 </head>
 <body ondblclick="showHint()">
 
+    <!-- [新增] 電腦版警示畫面 -->
+    <div id="desktop-warning">
+        <div class="text-6xl mb-4">📱</div>
+        <h1 class="text-2xl font-bold text-rose-gold mb-2 tracking-widest">
+            疑？只能用手機看內
+        </h1>
+        <p class="text-gray-400 font-mono text-sm">
+            請使用手機瀏覽或將視窗縮小
+        </p>
+    </div>
+
+    <!-- 背景圖層 -->
     <div class="bg-container">
         <div id="bg-2" class="bg-image animate-bg-2"></div>
         <div id="bg-1" class="bg-image animate-bg-1"></div>
     </div>
 
-    <!-- [調整重點 3 & 4] 內容容器 -->
-    <!-- pt-10: 控制距離頂部的距離 (Padding Top)。想再往上一點改 pt-6，想往下改 pt-16 -->
-    <!-- gap-3: 控制兩個方塊之間的距離 (Gap)。想近一點改 gap-2，想遠一點改 gap-5 -->
-    <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-3 px-6 pt-10">
+    <!-- [修改] 加上 mobile-content-wrapper class 以便在電腦版隱藏 -->
+    <div class="mobile-content-wrapper relative z-20 w-full max-w-md mx-auto flex flex-col gap-3 px-6 pt-10">
 
         <!-- 區塊一 -->
         <div class="glass-panel p-5 animate-float">
@@ -212,9 +251,7 @@
             </div>
         </div>
 
-        <!-- [調整重點 5] 底部佔位空間 -->
-        <!-- h-[800px]: 控制捲動的額外長度。覺得太長就改小，例如 h-[500px] -->
-        <div class="w-full h-[800px] shrink-0"></div>
+        <div class="w-full h-[800px] shrink-0 mobile-content-wrapper"></div>
 
     </div>
 
@@ -228,8 +265,9 @@
             還記得那天妳穿了一件黑色的外套，<br>
             我們約在誠品樓下...
         </p>
+        <!-- [修改] 中文提示 -->
         <div class="text-[10px] font-mono text-tech-cyan/60 uppercase tracking-widest border-t border-white/10 pt-2 mt-2">
-            Tap to Close
+            關閉提示
         </div>
     </div>
 
