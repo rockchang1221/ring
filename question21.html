@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     
+    <link rel="icon" href="favicon/favicon-64.ico">
+
     <script>
         tailwind.config = {
             theme: {
@@ -31,6 +33,8 @@
                         'bg-cycle': 'bgCycle steps(1) infinite', 
                         'float': 'float 6s ease-in-out infinite',
                         'pop-in': 'popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                        // [新增] 錯誤震動動畫
+                        'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
                     },
                     keyframes: {
                         bgCycle: {
@@ -44,6 +48,13 @@
                         popIn: {
                             '0%': { opacity: '0', transform: 'scale(0.8) translate(-50%, -50%)' },
                             '100%': { opacity: '1', transform: 'scale(1) translate(-50%, -50%)' },
+                        },
+                        // [新增] 震動關鍵影格
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
                         }
                     }
                 }
@@ -127,7 +138,6 @@
 </head>
 <body ondblclick="showHint()">
 
-    <!-- 電腦版擋板：改成可愛小貓風格 -->
     <div id="desktop-warning" class="hidden md:flex fixed inset-0 z-[9999] bg-[#0f1020] flex-col items-center justify-center text-center p-10">
         <div class="text-8xl mb-6 animate-bounce">
             🐱🙅‍♀️
@@ -137,7 +147,6 @@
         </h1>
     </div>
 
-    <!-- 手機版內容包裹器 -->
     <div id="mobile-view" class="w-full relative md:hidden" style="min-height: calc(100vw * 2500 / 1080);">
 
         <div class="bg-container">
@@ -145,60 +154,59 @@
             <div id="bg-1" class="bg-image animate-bg-1"></div>
         </div>
 
-        <!-- 內容容器 -->
-        <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-3 px-6 pt-10">
+        <div class="relative z-20 w-full max-w-md mx-auto flex flex-col gap-2 px-6 pt-10">
 
             <!-- 區塊一 -->
-            <div class="glass-panel p-5 animate-float">
+            <div class="glass-panel px-5 py-4 animate-float">
                 <div class="absolute -top-1 -right-1 w-20 h-20 bg-star-pink/20 blur-2xl rounded-full pointer-events-none"></div>
 
-                <div class="flex justify-between items-start mb-6 border-b border-white/10 pb-4">
+                <div class="flex justify-between items-start mb-2 border-b border-white/10 pb-2">
                     <div class="flex flex-col">
                         <span class="text-[10px] font-mono text-rose-gold/80 tracking-widest uppercase">Meet NO.</span>
-                        <span class="text-xl font-mono font-bold text-white tracking-wider">RR-00039</span>
+                        <span class="text-base font-mono font-bold text-white tracking-wider">RR-00039</span>
                     </div>
                     <div class="flex flex-col items-end">
                         <span class="text-[10px] font-mono text-rose-gold/80 tracking-widest uppercase">Date</span>
-                        <span class="text-xl font-mono font-bold text-white">2025-06-29</span>
+                        <span class="text-base font-mono font-bold text-white">2025-06-27</span>
                     </div>
                 </div>
 
                 <div class="flex items-start justify-between w-full">
                     <div class="flex flex-col flex-none items-start">
-                        <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">From</span>
-                        <span class="text-xl font-bold text-white leading-tight">臺中</span>
+                        <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-0">From</span>
+                        <span class="text-lg font-bold text-white leading-tight">臺中</span>
                     </div>
 
                     <div class="flex flex-col flex-1 items-end min-w-0">
-                        <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-1">To</span>
-                        <span class="text-xl font-bold text-white text-right leading-tight whitespace-nowrap w-full">
-                            名偵探琳誼專場 台北場
+                        <span class="text-[10px] font-mono text-rose-gold/70 tracking-widest mb-0">To</span>
+                        <span class="text-lg font-bold text-white text-right leading-tight whitespace-nowrap w-full">
+                            新專輯專場 台北場
                         </span>
                     </div>
                 </div>
             </div>
 
-            <!-- 區塊二 -->
-            <div class="glass-panel p-6 pb-6 border-rose-gold/30 shadow-glow">
-                <div class="mb-5">
-                    <span class="text-xs font-mono text-tech-cyan tracking-widest border-b border-tech-cyan/20 pb-1">Question 21.</span>
-                    <h2 class="text-xl font-bold text-white mt-3 leading-relaxed tracking-wide">
-                        問題21？
+            <!-- 區塊二：問題區 -->
+            <!-- [新增] id="question-panel" 讓JS可以抓到這個區塊來震動 -->
+            <div id="question-panel" class="glass-panel px-6 py-4 border-rose-gold/30 shadow-glow">
+                <div class="mb-3">
+                    <span class="text-xs font-mono text-tech-cyan tracking-widest border-b border-tech-cyan/20 pb-0.5">Question 21.</span>
+                    <h2 class="text-base font-bold text-white mt-2 leading-sung tracking-wide">
+                        <!--                                                                 題目最長到這|-->
+                        那天送給妳的生日卡片，我在信封上寫了TO：＿＿＿＿＿，妳後來有發在限動，還打了一個「疑？🤣」
                     </h2>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 mb-6 font-mono text-sm">
-                    <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
-                        <span class="text-tech-cyan mr-1">(A)</span> 5/20
+                <!-- [修改] 加入 onclick 事件判斷對錯 -->
+                <div class="grid gap-3 mb-3 font-mono text-sm">
+                    <button class="option-btn px-3 py-2 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors" onclick="checkAnswer(false)">
+                        <span class="text-tech-cyan mr-1">(A)</span> TO：大美女
                     </button>
-                    <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
-                        <span class="text-tech-cyan mr-1">(B)</span> 2/30
+                    <button class="option-btn px-3 py-2 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors" onclick="checkAnswer(false)">
+                        <span class="text-tech-cyan mr-1">(B)</span> TO：Ring
                     </button>
-                    <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
-                        <span class="text-tech-cyan mr-1">(C)</span> 9/28
-                    </button>
-                    <button class="option-btn p-3 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors">
-                        <span class="text-tech-cyan mr-1">(D)</span> 12/32
+                    <button class="option-btn px-3 py-2 rounded-xl text-left text-gray-200 hover:text-white hover:border-star-pink hover:bg-star-pink/10 transition-colors" onclick="checkAnswer(true)">
+                        <span class="text-tech-cyan mr-1">(C)</span> TO：最愛我的大美女
                     </button>
                 </div>
 
@@ -221,8 +229,7 @@
             </div>
             <h3 class="text-lg font-bold text-white mb-2 tracking-wide">秘密提示</h3>
             <p class="text-sm text-gray-300 leading-relaxed mb-4">
-                還記得那天妳穿了一件黑色的外套，<br>
-                我們約在誠品樓下...
+                我覺得這應該是一個事實，對吧？<br>真想不起來的話<br>就再去把卡片拿出來看一次吧😆
             </p>
             <div class="text-[10px] font-mono text-tech-cyan/60 uppercase tracking-widest border-t border-white/10 pt-2 mt-2">
                 關閉提示
@@ -233,6 +240,7 @@
 
     <script>
         const hintModal = document.getElementById('hint-modal');
+        const questionPanel = document.getElementById('question-panel'); // 抓取問題區塊
         let lastTap = 0;
         let isModalInteractable = false; 
 
@@ -273,6 +281,26 @@
                 hintModal.style.transform = '';
                 hintModal.style.transition = '';
             }, 300);
+        }
+
+        // [新增] 檢查答案並震動的邏輯
+        function checkAnswer(isCorrect) {
+            if (!isCorrect) {
+                // 如果答錯了
+                // 1. 移除 class 以便重置動畫 (如果連續點錯)
+                questionPanel.classList.remove('animate-shake');
+                
+                // 2. 強制瀏覽器重新繪製 (Reflow)，這是一個小技巧，讓動畫可以重播
+                void questionPanel.offsetWidth; 
+                
+                // 3. 加上震動 class
+                questionPanel.classList.add('animate-shake');
+                
+                // 這裡可以加個震動音效或其他反饋
+            } else {
+                // 如果答對了，暫時不做任何事，或者之後可以加跳轉邏輯
+                console.log("Bingo!");
+            }
         }
     </script>
 </body>
